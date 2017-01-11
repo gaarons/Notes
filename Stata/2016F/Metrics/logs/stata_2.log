@@ -1,0 +1,417 @@
+--------------------------------------------------------------------------------------------------
+      name:  Grant Aarons Assignment 2
+       log:  C:\Users\gaarons\Git\Notes\Stata\2016F\Metrics\logs\stata_2.log
+  log type:  text
+ opened on:  11 Nov 2016, 16:42:19
+
+. * Use s or t to get smcl or text log file
+. /*
+> Grant Aarons
+> gaarons@london.edu
+> Econometrics 1, London Business School
+> */
+. global programdir C:\Users\gaarons\Git\Notes\Stata\2016F\Metrics\programs
+
+. global datadir C:\Users\gaarons\Git\Notes\Stata\2016F\Metrics\data
+
+. global outputdir C:\Users\gaarons\Git\Notes\Stata\2016F\Metrics\output
+
+. /*
+> Program: stata_11.do
+> Description: Introduction to econometrics in stata
+> */
+. do $programdir/stata_21.do
+
+. /*
+> Grant Aarons
+> gaarons@london.edu
+> Econometrics 1, London Business School
+> Assignment 1
+> */
+. * Load the data
+. import excel "$datadir/NLS_2006.xls", sheet("Sheet1") firstrow clear
+
+. 
+. *** Part A
+. * Tabulate the variables we were given
+. tabstat luwe educ exper age fed med kww iq white, stat(min max mean sd)
+
+   stats |      luwe      educ     exper       age       fed       med       kww        iq
+---------+--------------------------------------------------------------------------------
+     min |  4.055853         9         5        28         0         0        12        50
+     max |  7.601318        18        23        38        18        18        56       145
+    mean |  5.945112  13.46825   13.6254  33.09365  8.114101  9.809473  35.79333   101.338
+      sd |  .4430556  2.198969  3.829564  3.105691  5.068486  4.002596  7.633321  15.04569
+------------------------------------------------------------------------------------------
+
+   stats |     white
+---------+----------
+     min |         0
+     max |         1
+    mean |  .8740581
+      sd |  .3319626
+--------------------
+
+. 
+. *** Part B
+. * nomenclature: p=power, r=root, a=add, s=subtract
+. * Generate a new variable for experience power squared
+. gen exper_p2 = exper^2
+
+. 
+. * Regression of luwe = alpha + beta_1*educ + beta_2*exper + beta_3*(exper^2)
+. reg luwe educ exper exper_p2
+
+      Source |       SS           df       MS      Number of obs   =       929
+-------------+----------------------------------   F(3, 925)       =     51.45
+       Model |  26.0511908         3  8.68373025   Prob > F        =    0.0000
+    Residual |  156.113596       925  .168771455   R-squared       =    0.1430
+-------------+----------------------------------   Adj R-squared   =    0.1402
+       Total |  182.164787       928  .196298261   Root MSE        =    .41082
+
+------------------------------------------------------------------------------
+        luwe |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+        educ |   .0926374   .0075898    12.21   0.000     .0777421    .1075326
+       exper |   .0770666   .0250237     3.08   0.002     .0279567    .1261764
+    exper_p2 |  -.0018955    .000873    -2.17   0.030    -.0036088   -.0001821
+       _cons |   4.027049   .2232709    18.04   0.000     3.588873    4.465226
+------------------------------------------------------------------------------
+
+. 
+. * Want to look at the mean of original predicted/fitted values (tell a story in 
+. * Part C) and D) of this assignment 
+. predict luwe_b_hat
+(option xb assumed; fitted values)
+
+. summ luwe_b_hat
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+  luwe_b_hat |        929    5.945112    .1675482   5.590306   6.401944
+
+. 
+. * The variance of the residual variance can be estimated as follows: 
+. * (under the assumption of normally distributed error terms)
+. scalar resid_variance = e(rmse)^2
+
+. scalar var_resid_variance = 2*resid_variance^2/e(df_r)
+
+. disp var_resid_variance
+.00006159
+
+. * So the variance-covariance matrix for all parameters is 
+. *(note the residual variance is uncorrelated with the regression parameters)
+. matrix define full_varcov_matrix=((e(V)\0,0,0,0),(0\0\0\0\var_resid_variance))
+
+. matrix rownames full_varcov_matrix =  educ  exper exper2 _cons resid_var
+
+. matrix colnames full_varcov_matrix =  educ  exper exper2 _cons resid_var
+
+. 
+. * Return the matrix for variance/covariance
+. matrix list full_varcov_matrix
+
+symmetric full_varcov_matrix[5,5]
+                 educ       exper      exper2       _cons   resid_var
+     educ   .00005761
+    exper   .00003496   .00062619
+   exper2  -5.577e-07  -.00002151   7.622e-07
+    _cons  -.00114052  -.00469353     .000148    .0498499
+resid_var           0           0           0           0   .00006159
+
+. 
+. *** Part C
+. * Preserve the current dataset, while we do the next steps
+. preserve
+
+. 
+. * Need to use in calculation later
+. egen exper_mean = mean(exper)
+
+. 
+. * Predict the effect of decreasing everyones education by one year
+. * This would increase everyones experience by a year 
+. * -> 1:1 tradeoff education for experience in years time
+. * We make these changes to the current dataset, before making predictions
+. replace educ = educ - 1
+(929 real changes made)
+
+. replace exper = exper + 1
+(929 real changes made)
+
+. replace exper_p2 = exper^2
+(929 real changes made)
+
+. tabstat luwe educ exper age fed med kww iq white, stat(min max mean sd)
+
+   stats |      luwe      educ     exper       age       fed       med       kww        iq
+---------+--------------------------------------------------------------------------------
+     min |  4.055853         8         6        28         0         0        12        50
+     max |  7.601318        17        24        38        18        18        56       145
+    mean |  5.945112  12.46825   14.6254  33.09365  8.114101  9.809473  35.79333   101.338
+      sd |  .4430556  2.198969  3.829564  3.105691  5.068486  4.002596  7.633321  15.04569
+------------------------------------------------------------------------------------------
+
+   stats |     white
+---------+----------
+     min |         0
+     max |         1
+    mean |  .8740581
+      sd |  .3319626
+--------------------
+
+. 
+. * Predict, uses the most recent regression output to run inference
+. predict luwe_c_hat
+(option xb assumed; fitted values)
+
+. summ luwe_c_hat
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+  luwe_c_hat |        929    5.875993    .1705074   5.515976   6.331405
+
+. tabstat luwe_b_hat luwe_c_hat, stat(mean)
+
+   stats |  luwe_b~t  luwe_c~t
+---------+--------------------
+    mean |  5.945112  5.875993
+------------------------------
+
+. egen b_mean = mean(luwe_b_hat)
+
+. egen c_mean = mean(luwe_c_hat)
+
+. scalar observed_diff = c_mean[1] - b_mean[1]
+
+. matrix list e(b)
+
+e(b)[1,4]
+          educ       exper    exper_p2       _cons
+y1   .09263739   .07706657  -.00189546   4.0270493
+
+. scalar delta = -1*_b[educ] + 1*_b[exper] + (2*exper_mean[1]+1)*_b[exper_p2] 
+
+. di observed_diff
+-.06911898
+
+. di delta
+-.06911909
+
+. 
+. * Give us the original dataset back
+. restore
+
+. 
+. * Make sure the dataset reverted 
+. tabstat luwe educ exper age fed med kww iq white, stat(min max mean sd)
+
+   stats |      luwe      educ     exper       age       fed       med       kww        iq
+---------+--------------------------------------------------------------------------------
+     min |  4.055853         9         5        28         0         0        12        50
+     max |  7.601318        18        23        38        18        18        56       145
+    mean |  5.945112  13.46825   13.6254  33.09365  8.114101  9.809473  35.79333   101.338
+      sd |  .4430556  2.198969  3.829564  3.105691  5.068486  4.002596  7.633321  15.04569
+------------------------------------------------------------------------------------------
+
+   stats |     white
+---------+----------
+     min |         0
+     max |         1
+    mean |  .8740581
+      sd |  .3319626
+--------------------
+
+. 
+. *** Part D
+. * We are asked to redefine the covariates
+. * luwe = alpha + beta_1(educ) + beta_2(exper + educ)...
+. *                          + beta_3(exper^2+(2*bar(exper)-1)*educ) + e
+. 
+. * Need to create these new covariates
+. gen educ_a_exper = educ + exper
+
+. egen bar_exper = mean(exper)
+
+. * Need to create everyone's experience increased by 1 year variable
+. gen exper_p2_a_n = (exper^2) + educ*(2*(bar_exper)+1)
+
+. 
+. * When we redefine the covariates we have to rerun the regression
+. reg luwe educ educ_a_exper exper_p2_a_n
+
+      Source |       SS           df       MS      Number of obs   =       929
+-------------+----------------------------------   F(3, 925)       =     51.45
+       Model |  26.0511912         3   8.6837304   Prob > F        =    0.0000
+    Residual |  156.113595       925  .168771455   R-squared       =    0.1430
+-------------+----------------------------------   Adj R-squared   =    0.1402
+       Total |  182.164787       928  .196298261   Root MSE        =    .41082
+
+------------------------------------------------------------------------------
+        luwe |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+        educ |   .0691191   .0061685    11.21   0.000     .0570131    .0812251
+educ_a_exper |   .0770666   .0250237     3.08   0.002     .0279568    .1261764
+exper_p2_a_n |  -.0018955    .000873    -2.17   0.030    -.0036088   -.0001821
+       _cons |   4.027049    .223271    18.04   0.000     3.588873    4.465225
+------------------------------------------------------------------------------
+
+. 
+. * The variance of the residual variance can be estimated as follows: 
+. * (under the assumption of normally distributed error terms)
+. scalar resid_variance = e(rmse)^2
+
+. scalar var_resid_variance = 2*resid_variance^2/e(df_r)
+
+. disp var_resid_variance
+.00006159
+
+. * So the variance-covariance matrix for all parameters is 
+. *(note the residual variance is uncorrelated with the regression parameters)
+. matrix define full_varcov_matrix=((e(V)\0,0,0,0),(0\0\0\0\var_resid_variance))
+
+. matrix rownames full_varcov_matrix =  educ  educ_a_exper exper_p2_a_n _cons resid_var
+
+. matrix colnames full_varcov_matrix =  educ  educ_a_exper exper_p2_a_n _cons resid_var
+
+. 
+. * Return the matrix for variance/covariance
+. matrix list full_varcov_matrix
+
+symmetric full_varcov_matrix[5,5]
+                      educ  educ_a_exper  exper_p2_a_n         _cons     resid_var
+        educ     .00003805
+educ_a_exper     .00001658     .00062619
+exper_p2_a_n    -5.747e-07    -.00002151     7.622e-07
+       _cons    -.00062799    -.00469354       .000148     .04984992
+   resid_var             0             0             0             0     .00006159
+
+. 
+. * Predict, uses the most recent regression output to run inference
+. predict luwe_d_hat
+(option xb assumed; fitted values)
+
+. summ luwe_d_hat
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+  luwe_d_hat |        929    5.945112    .1675482   5.590306   6.401944
+
+. 
+. * ANSWER:       We get the same results from Part C), because when we redefined
+. *                       the covariates and updated the regression coefficients, we preserved
+. *                       the relationships derived in the regression of Part C).  
+. 
+. *** Part E
+. * Back to the original variables
+. * Need to reset these values to original Part B) regression levels
+. * Regression of luwe = alpha + beta_1*educ + beta_2*(exper^2)
+. reg luwe educ exper_p2
+
+      Source |       SS           df       MS      Number of obs   =       929
+-------------+----------------------------------   F(2, 926)       =     71.78
+       Model |  24.4504255         2  12.2252128   Prob > F        =    0.0000
+    Residual |  157.714361       926  .170317885   R-squared       =    0.1342
+-------------+----------------------------------   Adj R-squared   =    0.1324
+       Total |  182.164787       928  .196298261   Root MSE        =     .4127
+
+------------------------------------------------------------------------------
+        luwe |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+        educ |   .0883343   .0074942    11.79   0.000     .0736267    .1030419
+    exper_p2 |   .0007524   .0001522     4.94   0.000     .0004537    .0010511
+       _cons |   4.604696   .1216728    37.84   0.000      4.36591    4.843483
+------------------------------------------------------------------------------
+
+. predict luwe_e_hat 
+(option xb assumed; fitted values)
+
+. 
+. * Compute the residual (y-y_hat)
+. gen e_luwe = luwe - luwe_e_hat
+
+. 
+. * Regression of exper = alpha + beta_1*educ + beta_2*(exper^2)
+. *reg exper educ exper_p2
+. reg exper educ exper_p2
+
+      Source |       SS           df       MS      Number of obs   =       929
+-------------+----------------------------------   F(2, 926)       =  22916.33
+       Model |  13340.1176         2  6670.05882   Prob > F        =    0.0000
+    Residual |  269.522841       926  .291061384   R-squared       =    0.9802
+-------------+----------------------------------   Adj R-squared   =    0.9802
+       Total |  13609.6405       928  14.6655609   Root MSE        =     .5395
+
+------------------------------------------------------------------------------
+       exper |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+        educ |  -.0558357   .0097969    -5.70   0.000    -.0750624   -.0366091
+    exper_p2 |   .0343581    .000199   172.69   0.000     .0339677    .0347486
+       _cons |    7.49543    .159058    47.12   0.000     7.183274    7.807586
+------------------------------------------------------------------------------
+
+. predict exper_e_hat
+(option xb assumed; fitted values)
+
+. 
+. * Compute the residual (y-y_hat)
+. gen e_exper = exper - exper_e_hat
+
+. 
+. * Regression of luwe = alpha + beta_1*educ + beta_2*(exper^2)
+. reg e_luwe e_exper
+
+      Source |       SS           df       MS      Number of obs   =       929
+-------------+----------------------------------   F(1, 927)       =      9.51
+       Model |  1.60076748         1  1.60076748   Prob > F        =    0.0021
+    Residual |  156.113593       927  .168407328   R-squared       =    0.0101
+-------------+----------------------------------   Adj R-squared   =    0.0091
+       Total |  157.714361       928   .16995082   Root MSE        =    .41037
+
+------------------------------------------------------------------------------
+      e_luwe |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     e_exper |   .0770666   .0249967     3.08   0.002     .0280099    .1261233
+       _cons |  -2.31e-08    .013464    -0.00   1.000    -.0264234    .0264233
+------------------------------------------------------------------------------
+
+. 
+. * The variance of the residual variance can be estimated as follows: 
+. * (under the assumption of normally distributed error terms)
+. scalar resid_variance = e(rmse)^2
+
+. scalar var_resid_variance = 2*resid_variance^2/e(df_r)
+
+. disp var_resid_variance
+.00006119
+
+. * So the variance-covariance matrix for all parameters is 
+. *(note the residual variance is uncorrelated with the regression parameters)
+. matrix define full_varcov_matrix=((e(V)\0,0),(0\0\var_resid_variance))
+
+. matrix rownames full_varcov_matrix =  e_luwe  e_exper resid_var
+
+. matrix colnames full_varcov_matrix =  e_luwe  e_exper resid_var
+
+. 
+. * Return the matrix for variance/covariance
+. matrix list full_varcov_matrix
+
+symmetric full_varcov_matrix[3,3]
+              e_luwe    e_exper  resid_var
+   e_luwe  .00062484
+  e_exper  3.303e-11  .00018128
+resid_var          0          0  .00006119
+
+. 
+. 
+end of do-file
+
+. 
+. log close _all
+      name:  Grant Aarons Assignment 2
+       log:  C:\Users\gaarons\Git\Notes\Stata\2016F\Metrics\logs\stata_2.log
+  log type:  text
+ closed on:  11 Nov 2016, 16:42:19
+--------------------------------------------------------------------------------------------------

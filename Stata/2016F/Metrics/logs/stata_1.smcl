@@ -1,0 +1,108 @@
+{smcl}
+{com}{sf}{ul off}{txt}{.-}
+      name:  {res}Grant Aarons Assignment 1
+       {txt}log:  {res}C:\Users\gaarons\Git\Notes\Stata\2016F\Metrics\logs\stata_1.smcl
+  {txt}log type:  {res}smcl
+ {txt}opened on:  {res}26 Oct 2016, 16:41:19
+{txt}
+{com}. /*
+> Grant Aarons
+> gaarons@london.edu
+> Econometrics 1, London Business School
+> */
+. global programdir C:\Users\gaarons\Git\Notes\Stata\2016F\Metrics\programs
+{txt}
+{com}. global datadir C:\Users\gaarons\Git\Notes\Stata\2016F\Metrics\data
+{txt}
+{com}. global outputdir C:\Users\gaarons\Git\Notes\Stata\2016F\Metrics\output
+{txt}
+{com}. /*
+> Program: stata_11.do
+> Description: Introduction to econometrics in stata
+> */
+. do $programdir/stata_11.do
+{txt}
+{com}. /*
+> Grant Aarons
+> gaarons@london.edu
+> Econometrics 1, London Business School
+> Assignment 1
+> */
+. * Load the data
+. import excel "$datadir/PS1_insurance.xls", sheet("Sheet1") firstrow clear
+{res}{txt}
+{com}. 
+. * Want to treat as dummies to get summary statistics/quantitative information
+. gen lottery_dum = 1 if(lottery=="Selected")
+{txt}(11,218 missing values generated)
+
+{com}. gen sex_dum = 1 if(female=="1: Female")
+{txt}(9,129 missing values generated)
+
+{com}. 
+. * Tabulate the variables we were given
+. tabstat lottery_dum birthyear sex_dum doc_visit_num hh_inc, stat(mean sd min max p25 p50 p75)
+
+{txt}   stats {...}
+{c |}{...}
+  lotter~m  birthy~r   sex_dum  doc_vi~m    hh_inc
+{hline 9}{c +}{hline 50}
+{ralign 8:mean} {...}
+{c |}{...}
+ {res}        1   1965.79         1  1.958573  13173.87
+{txt}{ralign 8:sd} {...}
+{c |}{...}
+ {res}        0  12.12016         0  2.941048  11805.89
+{txt}{ralign 8:min} {...}
+{c |}{...}
+ {res}        1      1945         1         0         0
+{txt}{ralign 8:max} {...}
+{c |}{...}
+ {res}        1      1988         1        30     50001
+{txt}{ralign 8:p25} {...}
+{c |}{...}
+ {res}        1      1956         1         0      3750
+{txt}{ralign 8:p50} {...}
+{c |}{...}
+ {res}        1      1964         1         1     11250
+{txt}{ralign 8:p75} {...}
+{c |}{...}
+ {res}        1      1976         1         3     18750
+{txt}{hline 9}{c BT}{hline 50}
+
+{com}. 
+. * Generate new variables for analysis
+. gen age_2010 = 2010 - birthyear
+{txt}
+{com}. gen visit_dum_2010 = 1 if(lottery_dum==1 & doc_visit_num>0)
+{txt}(15,268 missing values generated)
+
+{com}. 
+. * Summarize these new generated variables
+. summ age_2010 visit_dum_2010
+
+{txt}    Variable {c |}        Obs        Mean    Std. Dev.       Min        Max
+{hline 13}{c +}{hline 57}
+{space 4}age_2010 {c |}{res}     22,232    44.21046    12.12016         22         65
+{txt}visit_d~2010 {c |}{res}      6,964           1           0          1          1
+{txt}
+{com}. 
+. * Generate a historgram with fixed bin width
+. histogram hh_inc, width(2500)
+{txt}(bin={res}21{txt}, start={res}0{txt}, width={res}2500{txt})
+{res}{txt}
+{com}. graph export "$outputdir/histogram_1.pdf", replace
+{txt}(file C:\Users\gaarons\Git\Notes\Stata\2016F\Metrics\output/histogram_1.pdf written in PDF format)
+
+{com}. 
+{txt}end of do-file
+
+{com}. 
+. log close _all
+      {txt}name:  {res}Grant Aarons Assignment 1
+       {txt}log:  {res}C:\Users\gaarons\Git\Notes\Stata\2016F\Metrics\logs\stata_1.smcl
+  {txt}log type:  {res}smcl
+ {txt}closed on:  {res}26 Oct 2016, 16:41:20
+{txt}{.-}
+{smcl}
+{txt}{sf}{ul off}

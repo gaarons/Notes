@@ -1,0 +1,156 @@
+----------------------------------------
+      name:  Grant Aarons Assignment 1
+       log:  C:\Users\gaarons\Git\Notes\
+> Stata\2016F\Metrics\logs\stata_1.log
+  log type:  text
+ opened on:  26 Oct 2016, 16:38:29
+
+. /*
+> Grant Aarons
+> gaarons@london.edu
+> Econometrics 1, London Business School
+> */
+. global programdir C:\Users\gaarons\Git
+> \Notes\Stata\2016F\Metrics\programs
+
+. global datadir C:\Users\gaarons\Git\No
+> tes\Stata\2016F\Metrics\data
+
+. global outputdir C:\Users\gaarons\Git\
+> Notes\Stata\2016F\Metrics\output
+
+. /*
+> Program: stata_11.do
+> Description: Introduction to econometr
+> ics in stata
+> */
+. do $programdir/stata_11.do
+
+. /*
+> Grant Aarons
+> gaarons@london.edu
+> Econometrics 1, London Business School
+> Assignment 1
+> */
+. * Load the data
+. import excel "$datadir/PS1_insurance.x
+> ls", sheet("Sheet1") firstrow clear
+
+. 
+. * Want to treat as dummies to get summ
+> ary statistics/quantitative informatio
+> n
+. gen lottery_dum = 1 if(lottery=="Selec
+> ted")
+(11,218 missing values generated)
+
+. gen sex_dum = 1 if(female=="1: Female"
+> )
+(9,129 missing values generated)
+
+. 
+. * Tabulate the variables we were given
+. tabstat lottery_dum birthyear sex_dum 
+> doc_visit_num hh_inc, stat(mean sd min
+>  max p25 p50 p75)
+
+   stats |  lotter~m
+---------+----------
+    mean |         1
+      sd |         0
+     min |         1
+     max |         1
+     p25 |         1
+     p50 |         1
+     p75 |         1
+--------------------
+
+   stats |  birthy~r
+---------+----------
+    mean |   1965.79
+      sd |  12.12016
+     min |      1945
+     max |      1988
+     p25 |      1956
+     p50 |      1964
+     p75 |      1976
+--------------------
+
+   stats |   sex_dum
+---------+----------
+    mean |         1
+      sd |         0
+     min |         1
+     max |         1
+     p25 |         1
+     p50 |         1
+     p75 |         1
+--------------------
+
+   stats |  doc_vi~m
+---------+----------
+    mean |  1.958573
+      sd |  2.941048
+     min |         0
+     max |        30
+     p25 |         0
+     p50 |         1
+     p75 |         3
+--------------------
+
+   stats |    hh_inc
+---------+----------
+    mean |  13173.87
+      sd |  11805.89
+     min |         0
+     max |     50001
+     p25 |      3750
+     p50 |     11250
+     p75 |     18750
+--------------------
+
+. 
+. * Generate new variables for analysis
+. gen age_2010 = 2010 - birthyear
+
+. gen visit_dum_2010 = 1 if(lottery_dum=
+> =1 & doc_visit_num>0)
+(15,268 missing values generated)
+
+. 
+. * Summarize these new generated variab
+> les
+. summ age_2010 visit_dum_2010
+
+    Variable |        Obs        Mean   
+>  Std. Dev.       Min        Max
+-------------+--------------------------
+> -------------------------------
+    age_2010 |     22,232    44.21046   
+>  12.12016         22         65
+visit_d~2010 |      6,964           1   
+>         0          1          1
+
+. 
+. * Generate a historgram with fixed bin
+>  width
+. histogram hh_inc, width(2500)
+(bin=21, start=0, width=2500)
+
+. graph export "$outputdir/histogram_1.p
+> df", replace
+(file C:\Users\gaarons\Git\Notes\Stata\2
+> 016F\Metrics\output/histogram_1.pdf wr
+> itten in PDF format)
+
+. 
+end of do-file
+
+. 
+. log close _all
+      name:  Grant Aarons Assignment 1
+       log:  C:\Users\gaarons\Git\Notes\
+> Stata\2016F\Metrics\logs\stata_1.log
+  log type:  text
+ closed on:  26 Oct 2016, 16:38:30
+----------------------------------------
