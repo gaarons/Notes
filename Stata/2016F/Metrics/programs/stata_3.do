@@ -8,7 +8,8 @@ est clear
 *pause on
 
 global projdir C:\Users\gaarons\Git\Notes\Stata\2016F\Metrics
-log using $projdir\logs\stata_3, replace s name("Grant Aarons Assignment 3")
+global outdir "`projdir'\output"
+log using $projdir\logs\stata_3, replace t name("Grant Aarons Assignment 3")
 * Use s or t to get smcl or text log file
 /*
 Grant Aarons

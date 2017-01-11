@@ -40,8 +40,25 @@ reg w ed xp xp_p2
 
 
 *** Part B
-* Purely analytical and addressed in the LaTex write-up
-* Not asked to compute anything in Stata
+* Discussed in the LaTex write-up
+* Not asked to compute anything in Stata, but helpful to do so
+
+*Combined for all IV 
+rvfplot
+graph export "..\output\fittedResid_hettest.pdf", replace
+estat hettest
+
+*For individual IV 
+rvpplot ed
+graph export "..\output\edResid_hettest.pdf", replace
+rvpplot xp
+graph export "..\output\xpResid_hettest.pdf", replace
+rvpplot xp_p2
+graph export "..\output\xp_p2Resid_hettest.pdf", replace
+
+estat hettest ed
+estat hettest xp
+estat hettest xp_p2
 
 *** Part C
 * Purely analytical and addressed in the LaTex write-up
@@ -49,9 +66,11 @@ reg w ed xp xp_p2
 * The problem set should have asked us to compute the FE estimated coefficients
 xi year
 reg w ed xp xp_p2 i.year
-estimates store fixedEffects
-* Year fixed effect
-* FOR between each year demean the average over all firms, year fixed effect
+
+* To show the effect of different years on the coefficient estimates
+reg w ed xp xp_p2 if year==0
+reg w ed xp xp_p2 if year==1
+reg w ed xp xp_p2 if year==2
 
 *** Part D
 * Only MATLAB
@@ -70,7 +89,7 @@ replace xp_p2 = xp_p2 - exp_p2
 * Pooled Regression (1990-1992) but after demeaned/Within/FixedEffects
 *reg w_dm ed_dm xp_dm xp_p2_dm
 reg w ed xp xp_p2
-estimates store fixedEffectsWithin
+estimates store fixedEffects
 restore
 * Firm fixed effect
 * FOR within each individual demean the average over time, firm fixed effect
@@ -83,14 +102,17 @@ restore
 * Only MATLAB
 
 *** Part G
-* Only Stata
+* Only Stata - WE CANNOT DO THIS PROBLEM WITH THE STATA IC license that we are 
+* given.  Max matsize=800 on IC and we need 1500. 
+
 * Check if the results match with Stata by using the command xtgls on the 
 * variable from the original wage equation.
 
-*xtset year
-xtset year individual
+/* xtset individual year
+set matsize 2000
 xtgls w ed xp xp_p2
 estimates store gls
+*/
 
 * Follow up questions addressed in the LaTex write-up
 
@@ -100,7 +122,8 @@ estimates store gls
 *** Part H
 * Are the FGLS (MATLAB should match) results different than the FE ones? Perform a Hausman test. 
 
-hausman fixedEffects gls
+/* hausman fixedEffects gls
+*/
 
 * Follow up questions addressed in the LaTex write-up
 

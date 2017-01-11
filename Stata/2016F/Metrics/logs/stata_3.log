@@ -2,7 +2,7 @@
       name:  Grant Aarons Assignment 3
        log:  C:\Users\gaarons\Git\Notes\Stata\2016F\Metrics\logs\stata_3.log
   log type:  text
- opened on:  11 Jan 2017, 14:33:15
+ opened on:  11 Jan 2017, 20:52:09
 
 . * Use s or t to get smcl or text log file
 . /*
@@ -974,8 +974,69 @@ variable w was long now double
 . 
 . 
 . *** Part B
-. * Purely analytical and addressed in the LaTex write-up
-. * Not asked to compute anything in Stata
+. * Discussed in the LaTex write-up
+. * Not asked to compute anything in Stata, but helpful to do so
+. 
+. *Combined for all IV 
+. rvfplot
+
+. graph export "..\output\fittedResid_hettest.pdf", replace
+(file ..\output\fittedResid_hettest.pdf written in PDF format)
+
+. estat hettest
+
+Breusch-Pagan / Cook-Weisberg test for heteroskedasticity 
+         Ho: Constant variance
+         Variables: fitted values of w
+
+         chi2(1)      =   114.87
+         Prob > chi2  =   0.0000
+
+. 
+. *For individual IV 
+. rvpplot ed
+
+. graph export "..\output\edResid_hettest.pdf", replace
+(file ..\output\edResid_hettest.pdf written in PDF format)
+
+. rvpplot xp
+
+. graph export "..\output\xpResid_hettest.pdf", replace
+(file ..\output\xpResid_hettest.pdf written in PDF format)
+
+. rvpplot xp_p2
+
+. graph export "..\output\xp_p2Resid_hettest.pdf", replace
+(file ..\output\xp_p2Resid_hettest.pdf written in PDF format)
+
+. 
+. estat hettest ed
+
+Breusch-Pagan / Cook-Weisberg test for heteroskedasticity 
+         Ho: Constant variance
+         Variables: ed
+
+         chi2(1)      =    76.42
+         Prob > chi2  =   0.0000
+
+. estat hettest xp
+
+Breusch-Pagan / Cook-Weisberg test for heteroskedasticity 
+         Ho: Constant variance
+         Variables: xp
+
+         chi2(1)      =     1.19
+         Prob > chi2  =   0.2760
+
+. estat hettest xp_p2
+
+Breusch-Pagan / Cook-Weisberg test for heteroskedasticity 
+         Ho: Constant variance
+         Variables: xp_p2
+
+         chi2(1)      =     0.00
+         Prob > chi2  =   0.9587
+
 . 
 . *** Part C
 . * Purely analytical and addressed in the LaTex write-up
@@ -1006,10 +1067,62 @@ variable w was long now double
        _cons |   7.403881   .1652676    44.80   0.000     7.079875    7.727887
 ------------------------------------------------------------------------------
 
-. estimates store fixedEffects
+. 
+. * To show the effect of different years on the coefficient estimates
+. reg w ed xp xp_p2 if year==0
 
-. * Year fixed effect
-. * FOR between each year demean the average over all firms, year fixed effect
+      Source |       SS           df       MS      Number of obs   =     1,500
+-------------+----------------------------------   F(3, 1496)      =     46.28
+       Model |  91.6141861         3   30.538062   Prob > F        =    0.0000
+    Residual |  987.209592     1,496   .65989946   R-squared       =    0.0849
+-------------+----------------------------------   Adj R-squared   =    0.0831
+       Total |  1078.82378     1,499  .719695649   Root MSE        =    .81234
+
+------------------------------------------------------------------------------
+           w |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+          ed |   .1440517   .0131358    10.97   0.000     .1182852    .1698182
+          xp |    .026499   .0284373     0.93   0.352    -.0292823    .0822802
+       xp_p2 |   .0009687   .0013386     0.72   0.469    -.0016571    .0035945
+       _cons |   7.384689   .2795876    26.41   0.000     6.836263    7.933114
+------------------------------------------------------------------------------
+
+. reg w ed xp xp_p2 if year==1
+
+      Source |       SS           df       MS      Number of obs   =     1,500
+-------------+----------------------------------   F(3, 1496)      =     54.27
+       Model |  104.638302         3  34.8794341   Prob > F        =    0.0000
+    Residual |  961.470297     1,496  .642694049   R-squared       =    0.0981
+-------------+----------------------------------   Adj R-squared   =    0.0963
+       Total |   1066.1086     1,499  .711213208   Root MSE        =    .80168
+
+------------------------------------------------------------------------------
+           w |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+          ed |   .1440497   .0129141    11.15   0.000     .1187179    .1693814
+          xp |   .0152927   .0300446     0.51   0.611    -.0436413    .0742267
+       xp_p2 |   .0008968   .0012998     0.69   0.490    -.0016529    .0034464
+       _cons |   7.539949   .2956219    25.51   0.000     6.960071    8.119826
+------------------------------------------------------------------------------
+
+. reg w ed xp xp_p2 if year==2
+
+      Source |       SS           df       MS      Number of obs   =     1,500
+-------------+----------------------------------   F(3, 1496)      =     61.41
+       Model |   116.20869         3  38.7362301   Prob > F        =    0.0000
+    Residual |  943.702983     1,496  .630817502   R-squared       =    0.1096
+-------------+----------------------------------   Adj R-squared   =    0.1079
+       Total |  1059.91167     1,499  .707079168   Root MSE        =    .79424
+
+------------------------------------------------------------------------------
+           w |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+          ed |   .1501405    .012801    11.73   0.000     .1250307    .1752503
+          xp |   .0057006   .0322058     0.18   0.860    -.0574728    .0688741
+       xp_p2 |   .0012123   .0012884     0.94   0.347    -.0013151    .0037397
+       _cons |   7.519055   .3162754    23.77   0.000     6.898665    8.139446
+------------------------------------------------------------------------------
+
 . 
 . *** Part D
 . * Only MATLAB
@@ -1055,7 +1168,7 @@ variable ed was byte now float
        _cons |  -1.05e-08    .005783    -0.00   1.000    -.0113376    .0113375
 ------------------------------------------------------------------------------
 
-. estimates store fixedEffectsWithin
+. estimates store fixedEffects
 
 . restore
 
@@ -1070,41 +1183,17 @@ variable ed was byte now float
 . * Only MATLAB
 . 
 . *** Part G
-. * Only Stata
+. * Only Stata - WE CANNOT DO THIS PROBLEM WITH THE STATA IC license that we are 
+. * given.  Max matsize=800 on IC and we need 1500. 
+. 
 . * Check if the results match with Stata by using the command xtgls on the 
 . * variable from the original wage equation.
 . 
-. *xtset year
-. xtset year individual
-       panel variable:  year (strongly balanced)
-        time variable:  individual, 1 to 1500
-                delta:  1 unit
-
-. xtgls w ed xp xp_p2
-
-Cross-sectional time-series FGLS regression
-
-Coefficients:  generalized least squares
-Panels:        homoskedastic
-Correlation:   no autocorrelation
-
-Estimated covariances      =         1          Number of obs     =      4,500
-Estimated autocorrelations =         0          Number of groups  =          3
-Estimated coefficients     =         4          Time periods      =       1500
-                                                Wald chi2(3)      =     494.84
-Log likelihood             = -5393.413          Prob > chi2       =     0.0000
-
-------------------------------------------------------------------------------
-           w |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
--------------+----------------------------------------------------------------
-          ed |   .1479199   .0072249    20.47   0.000     .1337594    .1620804
-          xp |   .0273553   .0165894     1.65   0.099    -.0051594    .0598699
-       xp_p2 |   .0005749   .0007202     0.80   0.425    -.0008367    .0019864
-       _cons |   7.385116   .1621567    45.54   0.000     7.067294    7.702937
-------------------------------------------------------------------------------
-
-. estimates store gls
-
+. /* xtset individual year
+> set matsize 2000
+> xtgls w ed xp xp_p2
+> estimates store gls
+> */
 . 
 . * Follow up questions addressed in the LaTex write-up
 . 
@@ -1115,25 +1204,8 @@ Log likelihood             = -5393.413          Prob > chi2       =     0.0000
 . * Are the FGLS (MATLAB should match) results different than the FE ones? Perform a Hausman test.
 >  
 . 
-. hausman fixedEffects gls
-
-                 ---- Coefficients ----
-             |      (b)          (B)            (b-B)     sqrt(diag(V_b-V_B))
-             |  fixedEffects     gls         Difference          S.E.
--------------+----------------------------------------------------------------
-          ed |    .1464139     .1479199        -.001506        .0019113
-          xp |    .0253395     .0273553       -.0020158        .0022455
-       xp_p2 |    .0006004     .0005749        .0000255        .0000319
-------------------------------------------------------------------------------
-                         b = consistent under Ho and Ha; obtained from regress
-            B = inconsistent under Ha, efficient under Ho; obtained from xtgls
-
-    Test:  Ho:  difference in coefficients not systematic
-
-                  chi2(3) = (b-B)'[(V_b-V_B)^(-1)](b-B)
-                          =        0.88
-                Prob>chi2 =      0.8314
-
+. /* hausman fixedEffects gls
+> */
 . 
 . * Follow up questions addressed in the LaTex write-up
 . 
@@ -1147,5 +1219,5 @@ end of do-file
       name:  Grant Aarons Assignment 3
        log:  C:\Users\gaarons\Git\Notes\Stata\2016F\Metrics\logs\stata_3.log
   log type:  text
- closed on:  11 Jan 2017, 14:33:16
+ closed on:  11 Jan 2017, 20:52:11
 --------------------------------------------------------------------------------------------------

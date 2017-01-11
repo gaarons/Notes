@@ -3,7 +3,7 @@
       name:  {res}Grant Aarons Assignment 3
        {txt}log:  {res}C:\Users\gaarons\Git\Notes\Stata\2016F\Metrics\logs\stata_3.smcl
   {txt}log type:  {res}smcl
- {txt}opened on:  {res}11 Jan 2017, 14:33:03
+ {txt}opened on:  {res}11 Jan 2017, 20:52:01
 {txt}
 {com}. * Use s or t to get smcl or text log file
 . /*
@@ -1274,9 +1274,70 @@ Number of obs.                 {res}    1500   {txt}->{res}    4500
 . 
 . 
 . *** Part B
-. * Purely analytical and addressed in the LaTex write-up
-. * Not asked to compute anything in Stata
+. * Discussed in the LaTex write-up
+. * Not asked to compute anything in Stata, but helpful to do so
 . 
+. *Combined for all IV 
+. rvfplot
+{res}{txt}
+{com}. graph export "..\output\fittedResid_hettest.pdf", replace
+{txt}(file ..\output\fittedResid_hettest.pdf written in PDF format)
+
+{com}. estat hettest
+
+{txt}Breusch-Pagan / Cook-Weisberg test for heteroskedasticity 
+         Ho: Constant variance
+{p 9 20}Variables: fitted values of w
+
+{col 10}chi2({res}1{txt}){col 23}={res}   114.87
+{txt}{col 10}Prob > chi2{col 23}={res}   0.0000
+{txt}
+{com}. 
+. *For individual IV 
+. rvpplot ed
+{res}{txt}
+{com}. graph export "..\output\edResid_hettest.pdf", replace
+{txt}(file ..\output\edResid_hettest.pdf written in PDF format)
+
+{com}. rvpplot xp
+{res}{txt}
+{com}. graph export "..\output\xpResid_hettest.pdf", replace
+{txt}(file ..\output\xpResid_hettest.pdf written in PDF format)
+
+{com}. rvpplot xp_p2
+{res}{txt}
+{com}. graph export "..\output\xp_p2Resid_hettest.pdf", replace
+{txt}(file ..\output\xp_p2Resid_hettest.pdf written in PDF format)
+
+{com}. 
+. estat hettest ed
+
+{txt}Breusch-Pagan / Cook-Weisberg test for heteroskedasticity 
+         Ho: Constant variance
+{p 9 20}Variables: ed
+
+{col 10}chi2({res}1{txt}){col 23}={res}    76.42
+{txt}{col 10}Prob > chi2{col 23}={res}   0.0000
+{txt}
+{com}. estat hettest xp
+
+{txt}Breusch-Pagan / Cook-Weisberg test for heteroskedasticity 
+         Ho: Constant variance
+{p 9 20}Variables: xp
+
+{col 10}chi2({res}1{txt}){col 23}={res}     1.19
+{txt}{col 10}Prob > chi2{col 23}={res}   0.2760
+{txt}
+{com}. estat hettest xp_p2
+
+{txt}Breusch-Pagan / Cook-Weisberg test for heteroskedasticity 
+         Ho: Constant variance
+{p 9 20}Variables: xp_p2
+
+{col 10}chi2({res}1{txt}){col 23}={res}     0.00
+{txt}{col 10}Prob > chi2{col 23}={res}   0.9587
+{txt}
+{com}. 
 . *** Part C
 . * Purely analytical and addressed in the LaTex write-up
 . * Not asked to compute anything in Stata
@@ -1306,11 +1367,63 @@ Number of obs.                 {res}    1500   {txt}->{res}    4500
 {space 7}_cons {c |}{col 14}{res}{space 2} 7.403881{col 26}{space 2} .1652676{col 37}{space 1}   44.80{col 46}{space 3}0.000{col 54}{space 4} 7.079875{col 67}{space 3} 7.727887
 {txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
 {res}{txt}
-{com}. estimates store fixedEffects
-{txt}
-{com}. * Year fixed effect
-. * FOR between each year demean the average over all firms, year fixed effect
-. 
+{com}. 
+. * To show the effect of different years on the coefficient estimates
+. reg w ed xp xp_p2 if year==0
+
+{txt}      Source {c |}       SS           df       MS      Number of obs   ={res}     1,500
+{txt}{hline 13}{c +}{hline 34}   F(3, 1496)      = {res}    46.28
+{txt}       Model {c |} {res} 91.6141861         3   30.538062   {txt}Prob > F        ={res}    0.0000
+{txt}    Residual {c |} {res} 987.209592     1,496   .65989946   {txt}R-squared       ={res}    0.0849
+{txt}{hline 13}{c +}{hline 34}   Adj R-squared   ={res}    0.0831
+{txt}       Total {c |} {res} 1078.82378     1,499  .719695649   {txt}Root MSE        =   {res} .81234
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}           w{col 14}{c |}      Coef.{col 26}   Std. Err.{col 38}      t{col 46}   P>|t|{col 54}     [95% Con{col 67}f. Interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 10}ed {c |}{col 14}{res}{space 2} .1440517{col 26}{space 2} .0131358{col 37}{space 1}   10.97{col 46}{space 3}0.000{col 54}{space 4} .1182852{col 67}{space 3} .1698182
+{txt}{space 10}xp {c |}{col 14}{res}{space 2}  .026499{col 26}{space 2} .0284373{col 37}{space 1}    0.93{col 46}{space 3}0.352{col 54}{space 4}-.0292823{col 67}{space 3} .0822802
+{txt}{space 7}xp_p2 {c |}{col 14}{res}{space 2} .0009687{col 26}{space 2} .0013386{col 37}{space 1}    0.72{col 46}{space 3}0.469{col 54}{space 4}-.0016571{col 67}{space 3} .0035945
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} 7.384689{col 26}{space 2} .2795876{col 37}{space 1}   26.41{col 46}{space 3}0.000{col 54}{space 4} 6.836263{col 67}{space 3} 7.933114
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}{txt}
+{com}. reg w ed xp xp_p2 if year==1
+
+{txt}      Source {c |}       SS           df       MS      Number of obs   ={res}     1,500
+{txt}{hline 13}{c +}{hline 34}   F(3, 1496)      = {res}    54.27
+{txt}       Model {c |} {res} 104.638302         3  34.8794341   {txt}Prob > F        ={res}    0.0000
+{txt}    Residual {c |} {res} 961.470297     1,496  .642694049   {txt}R-squared       ={res}    0.0981
+{txt}{hline 13}{c +}{hline 34}   Adj R-squared   ={res}    0.0963
+{txt}       Total {c |} {res}  1066.1086     1,499  .711213208   {txt}Root MSE        =   {res} .80168
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}           w{col 14}{c |}      Coef.{col 26}   Std. Err.{col 38}      t{col 46}   P>|t|{col 54}     [95% Con{col 67}f. Interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 10}ed {c |}{col 14}{res}{space 2} .1440497{col 26}{space 2} .0129141{col 37}{space 1}   11.15{col 46}{space 3}0.000{col 54}{space 4} .1187179{col 67}{space 3} .1693814
+{txt}{space 10}xp {c |}{col 14}{res}{space 2} .0152927{col 26}{space 2} .0300446{col 37}{space 1}    0.51{col 46}{space 3}0.611{col 54}{space 4}-.0436413{col 67}{space 3} .0742267
+{txt}{space 7}xp_p2 {c |}{col 14}{res}{space 2} .0008968{col 26}{space 2} .0012998{col 37}{space 1}    0.69{col 46}{space 3}0.490{col 54}{space 4}-.0016529{col 67}{space 3} .0034464
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} 7.539949{col 26}{space 2} .2956219{col 37}{space 1}   25.51{col 46}{space 3}0.000{col 54}{space 4} 6.960071{col 67}{space 3} 8.119826
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}{txt}
+{com}. reg w ed xp xp_p2 if year==2
+
+{txt}      Source {c |}       SS           df       MS      Number of obs   ={res}     1,500
+{txt}{hline 13}{c +}{hline 34}   F(3, 1496)      = {res}    61.41
+{txt}       Model {c |} {res}  116.20869         3  38.7362301   {txt}Prob > F        ={res}    0.0000
+{txt}    Residual {c |} {res} 943.702983     1,496  .630817502   {txt}R-squared       ={res}    0.1096
+{txt}{hline 13}{c +}{hline 34}   Adj R-squared   ={res}    0.1079
+{txt}       Total {c |} {res} 1059.91167     1,499  .707079168   {txt}Root MSE        =   {res} .79424
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}           w{col 14}{c |}      Coef.{col 26}   Std. Err.{col 38}      t{col 46}   P>|t|{col 54}     [95% Con{col 67}f. Interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 10}ed {c |}{col 14}{res}{space 2} .1501405{col 26}{space 2}  .012801{col 37}{space 1}   11.73{col 46}{space 3}0.000{col 54}{space 4} .1250307{col 67}{space 3} .1752503
+{txt}{space 10}xp {c |}{col 14}{res}{space 2} .0057006{col 26}{space 2} .0322058{col 37}{space 1}    0.18{col 46}{space 3}0.860{col 54}{space 4}-.0574728{col 67}{space 3} .0688741
+{txt}{space 7}xp_p2 {c |}{col 14}{res}{space 2} .0012123{col 26}{space 2} .0012884{col 37}{space 1}    0.94{col 46}{space 3}0.347{col 54}{space 4}-.0013151{col 67}{space 3} .0037397
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} 7.519055{col 26}{space 2} .3162754{col 37}{space 1}   23.77{col 46}{space 3}0.000{col 54}{space 4} 6.898665{col 67}{space 3} 8.139446
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}{txt}
+{com}. 
 . *** Part D
 . * Only MATLAB
 . 
@@ -1355,7 +1468,7 @@ Number of obs.                 {res}    1500   {txt}->{res}    4500
 {txt}{space 7}_cons {c |}{col 14}{res}{space 2}-1.05e-08{col 26}{space 2}  .005783{col 37}{space 1}   -0.00{col 46}{space 3}1.000{col 54}{space 4}-.0113376{col 67}{space 3} .0113375
 {txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
 {res}{txt}
-{com}. estimates store fixedEffectsWithin
+{com}. estimates store fixedEffects
 {txt}
 {com}. restore
 {txt}
@@ -1370,42 +1483,18 @@ Number of obs.                 {res}    1500   {txt}->{res}    4500
 . * Only MATLAB
 . 
 . *** Part G
-. * Only Stata
+. * Only Stata - WE CANNOT DO THIS PROBLEM WITH THE STATA IC license that we are 
+. * given.  Max matsize=800 on IC and we need 1500. 
+. 
 . * Check if the results match with Stata by using the command xtgls on the 
 . * variable from the original wage equation.
 . 
-. *xtset year
-. xtset year individual
-{res}{txt}{col 8}panel variable:  {res}year (strongly balanced)
-{txt}{col 9}time variable:  {res}{col 25}individual, 1 to 1500
-{txt}{col 17}delta:  {res}1 unit
-{txt}
-{com}. xtgls w ed xp xp_p2
-
-{txt}Cross-sectional time-series FGLS regression
-
-Coefficients:  {res}generalized least squares
-{txt}Panels:        {res}homoskedastic
-{txt}Correlation:   {res}no autocorrelation
-
-{txt}Estimated covariances{col 28}= {res}        1{txt}{col 49}Number of obs{col 67}= {res}     4,500
-{txt}Estimated autocorrelations{col 28}= {res}        0{txt}{col 49}Number of groups{col 67}= {res}         3
-{txt}Estimated coefficients{col 28}= {res}        4{txt}{col 49}Time periods{col 67}=  {res}     1500
-{txt}{col 49}Wald chi2({res}3{txt}){col 67}=  {res}   494.84
-{txt}Log likelihood{col 28}= {res}-5393.413{txt}{col 49}Prob > chi2{col 67}= {res}    0.0000
-
-{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
-{col 1}           w{col 14}{c |}      Coef.{col 26}   Std. Err.{col 38}      z{col 46}   P>|z|{col 54}     [95% Con{col 67}f. Interval]
-{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
-{space 10}ed {c |}{col 14}{res}{space 2} .1479199{col 26}{space 2} .0072249{col 37}{space 1}   20.47{col 46}{space 3}0.000{col 54}{space 4} .1337594{col 67}{space 3} .1620804
-{txt}{space 10}xp {c |}{col 14}{res}{space 2} .0273553{col 26}{space 2} .0165894{col 37}{space 1}    1.65{col 46}{space 3}0.099{col 54}{space 4}-.0051594{col 67}{space 3} .0598699
-{txt}{space 7}xp_p2 {c |}{col 14}{res}{space 2} .0005749{col 26}{space 2} .0007202{col 37}{space 1}    0.80{col 46}{space 3}0.425{col 54}{space 4}-.0008367{col 67}{space 3} .0019864
-{txt}{space 7}_cons {c |}{col 14}{res}{space 2} 7.385116{col 26}{space 2} .1621567{col 37}{space 1}   45.54{col 46}{space 3}0.000{col 54}{space 4} 7.067294{col 67}{space 3} 7.702937
-{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
-
-{com}. estimates store gls
-{txt}
-{com}. 
+. /* xtset individual year
+> set matsize 2000
+> xtgls w ed xp xp_p2
+> estimates store gls
+> */
+. 
 . * Follow up questions addressed in the LaTex write-up
 . 
 . *pause Part G completed
@@ -1414,26 +1503,9 @@ Coefficients:  {res}generalized least squares
 . *** Part H
 . * Are the FGLS (MATLAB should match) results different than the FE ones? Perform a Hausman test. 
 . 
-. hausman fixedEffects gls
-
-{txt}{col 18}{hline 4} Coefficients {hline 4}
-{col 14}{c |}{col 21}(b){col 34}(B){col 49}(b-B){col 59}sqrt(diag(V_b-V_B))
-{col 14}{c |}{col 17}fixedEffects{col 30}    gls     {col 46}Difference{col 66}S.E.
-{hline 13}{c +}{hline 64}
-{space 10}ed {c |}{res}{col 18} .1464139{col 31} .1479199{col 47} -.001506{col 63} .0019113
-{txt}{space 10}xp {c |}{res}{col 18} .0253395{col 31} .0273553{col 47}-.0020158{col 63} .0022455
-{txt}{space 7}xp_p2 {c |}{res}{col 18} .0006004{col 31} .0005749{col 47} .0000255{col 63} .0000319
-{txt}{hline 13}{c BT}{hline 64}
-{ralign 78:b = consistent under Ho and Ha; obtained from regress}
-{ralign 78:B = inconsistent under Ha, efficient under Ho; obtained from xtgls}
-
-    Test:  Ho:  difference in coefficients not systematic
-
-{ralign 25:chi2({res:3})} = (b-B)'[(V_b-V_B)^(-1)](b-B)
-{col 27}=  {res}      0.88
-{txt}{col 17}Prob>chi2 =  {res}    0.8314
-{txt}
-{com}. 
+. /* hausman fixedEffects gls
+> */
+. 
 . * Follow up questions addressed in the LaTex write-up
 . 
 . *pause Part H completed
@@ -1446,7 +1518,7 @@ Coefficients:  {res}generalized least squares
       {txt}name:  {res}Grant Aarons Assignment 3
        {txt}log:  {res}C:\Users\gaarons\Git\Notes\Stata\2016F\Metrics\logs\stata_3.smcl
   {txt}log type:  {res}smcl
- {txt}closed on:  {res}11 Jan 2017, 14:33:04
+ {txt}closed on:  {res}11 Jan 2017, 20:52:03
 {txt}{.-}
 {smcl}
 {txt}{sf}{ul off}
