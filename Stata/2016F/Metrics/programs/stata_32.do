@@ -114,16 +114,19 @@ xtgls w ed xp xp_p2
 estimates store gls
 */
 
+xtset individual year
+xtreg w ed xp xp_p2, re
+estimates store gls
+
 * Follow up questions addressed in the LaTex write-up
 
 *pause Part G completed
 
 
 *** Part H
-* Are the FGLS (MATLAB should match) results different than the FE ones? Perform a Hausman test. 
+* Are the FGLS results different than the FE ones? Perform a Hausman test. 
 
-/* hausman fixedEffects gls
-*/
+hausman fixedEffects gls
 
 * Follow up questions addressed in the LaTex write-up
 

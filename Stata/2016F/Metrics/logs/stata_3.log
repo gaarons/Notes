@@ -2,7 +2,7 @@
       name:  Grant Aarons Assignment 3
        log:  C:\Users\gaarons\Git\Notes\Stata\2016F\Metrics\logs\stata_3.log
   log type:  text
- opened on:  11 Jan 2017, 20:52:09
+ opened on:  12 Jan 2017, 12:47:25
 
 . * Use s or t to get smcl or text log file
 . /*
@@ -21,6 +21,9 @@
 > Description: Introduction to econometrics in stata
 > */
 . 
+. **********************************************************************
+. ************************** START QUESTION 4 **************************
+. **********************************************************************
 . do $programdir/stata_31.do
 
 . /*
@@ -871,6 +874,10 @@ Summary statistics: min, max, mean, sd
 end of do-file
 
 . 
+. 
+. **********************************************************************
+. ************************** START QUESTION 5 **************************
+. **********************************************************************
 . do $programdir/stata_32.do
 
 . /*
@@ -1195,17 +1202,67 @@ variable ed was byte now float
 > estimates store gls
 > */
 . 
+. xtset individual year
+       panel variable:  individual (strongly balanced)
+        time variable:  year, 0 to 2
+                delta:  1 unit
+
+. xtreg w ed xp xp_p2, re
+
+Random-effects GLS regression                   Number of obs     =      4,500
+Group variable: individual                      Number of groups  =      1,500
+
+R-sq:                                           Obs per group:
+     within  = 0.0111                                         min =          3
+     between = 0.1216                                         avg =        3.0
+     overall = 0.0979                                         max =          3
+
+                                                Wald chi2(3)      =     240.24
+corr(u_i, X)   = 0 (assumed)                    Prob > chi2       =     0.0000
+
+------------------------------------------------------------------------------
+           w |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+          ed |   .1480811   .0096409    15.36   0.000     .1291853     .166977
+          xp |   .0646342   .0200796     3.22   0.001     .0252789    .1039895
+       xp_p2 |  -.0009324   .0008798    -1.06   0.289    -.0026567     .000792
+       _cons |   7.172555   .2005449    35.77   0.000     6.779494    7.565616
+-------------+----------------------------------------------------------------
+     sigma_u |  .64661827
+     sigma_e |  .47514938
+         rho |  .64936605   (fraction of variance due to u_i)
+------------------------------------------------------------------------------
+
+. estimates store gls
+
+. 
 . * Follow up questions addressed in the LaTex write-up
 . 
 . *pause Part G completed
 . 
 . 
 . *** Part H
-. * Are the FGLS (MATLAB should match) results different than the FE ones? Perform a Hausman test.
->  
+. * Are the FGLS results different than the FE ones? Perform a Hausman test. 
 . 
-. /* hausman fixedEffects gls
-> */
+. hausman fixedEffects gls
+
+                 ---- Coefficients ----
+             |      (b)          (B)            (b-B)     sqrt(diag(V_b-V_B))
+             |  fixedEffects     gls         Difference          S.E.
+-------------+----------------------------------------------------------------
+          ed |    .0637628     .1480811       -.0843184        .0246168
+          xp |    .1301495     .0646342        .0655153        .0149259
+       xp_p2 |   -.0035098    -.0009324       -.0025775        .0006813
+------------------------------------------------------------------------------
+                         b = consistent under Ho and Ha; obtained from regress
+            B = inconsistent under Ha, efficient under Ho; obtained from xtreg
+
+    Test:  Ho:  difference in coefficients not systematic
+
+                  chi2(3) = (b-B)'[(V_b-V_B)^(-1)](b-B)
+                          =       33.41
+                Prob>chi2 =      0.0000
+
 . 
 . * Follow up questions addressed in the LaTex write-up
 . 
@@ -1219,5 +1276,5 @@ end of do-file
       name:  Grant Aarons Assignment 3
        log:  C:\Users\gaarons\Git\Notes\Stata\2016F\Metrics\logs\stata_3.log
   log type:  text
- closed on:  11 Jan 2017, 20:52:11
+ closed on:  12 Jan 2017, 12:47:27
 --------------------------------------------------------------------------------------------------
