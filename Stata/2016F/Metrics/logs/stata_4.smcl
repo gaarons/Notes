@@ -1,0 +1,257 @@
+{smcl}
+{txt}{sf}{ul off}{.-}
+      name:  {res}Grant Aarons Assignment 4
+       {txt}log:  {res}C:\Users\gaarons\Git\Notes\Stata\2016F\Metrics\logs\stata_4.smcl
+  {txt}log type:  {res}smcl
+ {txt}opened on:  {res}10 Feb 2017, 18:01:14
+{txt}
+{com}. * Use s or t to get smcl or text log file
+. /*
+> Grant Aarons
+> gaarons@london.edu
+> Econometrics 1, London Business School
+> */
+. global programdir C:\Users\gaarons\Git\Notes\Stata\2016F\Metrics\programs
+{txt}
+{com}. global datadir C:\Users\gaarons\Git\Notes\Stata\2016F\Metrics\data
+{txt}
+{com}. global outputdir C:\Users\gaarons\Git\Notes\Stata\2016F\Metrics\output
+{txt}
+{com}. /*
+> Program: stata_41.do
+> Description: Introduction to econometrics in stata
+> */
+. 
+. **********************************************************************
+. ************************** START QUESTION 3 **************************
+. **********************************************************************
+. do $programdir/stata_41.do
+{txt}
+{com}. /*
+> Grant Aarons
+> gaarons@london.edu
+> Econometrics 1, London Business School
+> Assignment 4
+> */
+. * Load the data
+. import excel "$datadir/problems.xls", sheet("problems12") firstrow clear
+{res}{txt}
+{com}. * pause Dataset has been loaded
+. 
+. * Generate all neccessary or helpful variables
+. *gen datenum = year+(quarter-1)*(0.25)
+. gen t = _n
+{txt}
+{com}. gen newt = tq(1948q1) + t - 1
+{txt}
+{com}. tsset newt, quarterly
+{res}{txt}{col 9}time variable:  {res}{col 25}newt, 1948q1 to 2002q4
+{txt}{col 17}delta:  {res}1 quarter
+{txt}
+{com}. 
+. gen cpta = (realconsumptionofnondurables +  realconsumptionofservices)/population
+{txt}
+{com}. gen ypta = (realdisposableincome)/population
+{txt}
+{com}. 
+. * Prettier ways of doing this but whatever
+. gen lcpta_1 = l.cpta 
+{txt}(1 missing value generated)
+
+{com}. gen lcpta_2 = l.lcpta_1
+{txt}(2 missing values generated)
+
+{com}. gen lcpta_3 = l.lcpta_2
+{txt}(3 missing values generated)
+
+{com}. gen lcpta_4 = l.lcpta_3
+{txt}(4 missing values generated)
+
+{com}. gen lcpta_5 = l.lcpta_4
+{txt}(5 missing values generated)
+
+{com}. gen lcpta_6 = l.lcpta_5
+{txt}(6 missing values generated)
+
+{com}. gen lypta_1 = l.ypta 
+{txt}(1 missing value generated)
+
+{com}. 
+. * first difference income per capita
+. gen fd_ypta = ypta-lypta_1
+{txt}(1 missing value generated)
+
+{com}. *cpta add lag 1
+. gen cpta_al1 = cpta+lcpta_1
+{txt}(1 missing value generated)
+
+{com}. 
+. * Logical thing to do, take logs and then do all the generated variables again
+. gen ln_cpta = ln(cpta)
+{txt}
+{com}. gen ln_ypta = ln(ypta)
+{txt}
+{com}. gen ln_lcpta_1 = l.ln_cpta 
+{txt}(1 missing value generated)
+
+{com}. gen ln_lypta_1 = l.ln_ypta 
+{txt}(1 missing value generated)
+
+{com}. * logarithm of first difference income per capita
+. gen ln_fd_ypta = ln_ypta-ln_lypta_1
+{txt}(1 missing value generated)
+
+{com}. * logarithm of cpta add lag 1
+. gen ln_cpta_al1 = ln_cpta+ln_lcpta_1
+{txt}(1 missing value generated)
+
+{com}. 
+. gen instrument1 = lcpta_2 - lcpta_3
+{txt}(3 missing values generated)
+
+{com}. gen instrument2 = lcpta_3 - lcpta_4
+{txt}(4 missing values generated)
+
+{com}. gen instrument3 = lcpta_4 - lcpta_5
+{txt}(5 missing values generated)
+
+{com}. gen instrument4 = lcpta_5 - lcpta_6 
+{txt}(6 missing values generated)
+
+{com}. 
+. *** Part A
+. * Do the simple regression of C_t on 4 period lags of C_t and a constant
+. reg cpta lcpta_1 lcpta_2 lcpta_3 lcpta_4
+
+{txt}      Source {c |}       SS           df       MS      Number of obs   ={res}       216
+{txt}{hline 13}{c +}{hline 34}   F(4, 211)       > {res} 99999.00
+{txt}       Model {c |} {res} .004822372         4  .001205593   {txt}Prob > F        ={res}    0.0000
+{txt}    Residual {c |} {res} 1.2145e-06       211  5.7561e-09   {txt}R-squared       ={res}    0.9997
+{txt}{hline 13}{c +}{hline 34}   Adj R-squared   ={res}    0.9997
+{txt}       Total {c |} {res} .004823586       215  .000022435   {txt}Root MSE        =   {res} 7.6e-05
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}        cpta{col 14}{c |}      Coef.{col 26}   Std. Err.{col 38}      t{col 46}   P>|t|{col 54}     [95% Con{col 67}f. Interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 5}lcpta_1 {c |}{col 14}{res}{space 2} 1.192335{col 26}{space 2} .0673783{col 37}{space 1}   17.70{col 46}{space 3}0.000{col 54}{space 4} 1.059514{col 67}{space 3} 1.325156
+{txt}{space 5}lcpta_2 {c |}{col 14}{res}{space 2}-.1281352{col 26}{space 2} .1057009{col 37}{space 1}   -1.21{col 46}{space 3}0.227{col 54}{space 4}-.3365003{col 67}{space 3}   .08023
+{txt}{space 5}lcpta_3 {c |}{col 14}{res}{space 2} .1443307{col 26}{space 2}  .105489{col 37}{space 1}    1.37{col 46}{space 3}0.173{col 54}{space 4}-.0636167{col 67}{space 3} .3522782
+{txt}{space 5}lcpta_4 {c |}{col 14}{res}{space 2}-.2074643{col 26}{space 2}   .06753{col 37}{space 1}   -3.07{col 46}{space 3}0.002{col 54}{space 4}-.3405841{col 67}{space 3}-.0743444
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} .0000244{col 26}{space 2} .0000192{col 37}{space 1}    1.27{col 46}{space 3}0.207{col 54}{space 4}-.0000136{col 67}{space 3} .0000623
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}{txt}
+{com}. 
+. * Test the hypothesis that the beta_2 = beta_3 = beta_4 = 0
+. test lcpta_2=lcpta_3=lcpta_4=0
+
+{p 0 7}{space 1}{text:( 1)}{space 1} {res}lcpta_2 - lcpta_3 = 0{p_end}
+{p 0 7}{space 1}{text:( 2)}{space 1} lcpta_2 - lcpta_4 = 0{p_end}
+{p 0 7}{space 1}{text:( 3)}{space 1} lcpta_2 = 0{p_end}
+
+{txt}       F(  3,   211) ={res}    8.41
+{txt}{col 13}Prob > F ={res}    0.0000
+{txt}
+{com}. 
+. *pause Part A completed
+. 
+. *** Part B
+. * Set up the LHS variable to match the C_t + C_{c -(}t-1{c )-} in the homework write up
+. * Do the simple regression of C_t + C_{c -(}t-1{c )-} on first difference per capita income
+. * and a constant
+. reg cpta_al1 fd_ypta
+
+{txt}      Source {c |}       SS           df       MS      Number of obs   ={res}       219
+{txt}{hline 13}{c +}{hline 34}   F(1, 217)       = {res}     0.98
+{txt}       Model {c |} {res} .000089443         1  .000089443   {txt}Prob > F        ={res}    0.3242
+{txt}    Residual {c |} {res} .019880734       217  .000091616   {txt}R-squared       ={res}    0.0045
+{txt}{hline 13}{c +}{hline 34}   Adj R-squared   ={res}   -0.0001
+{txt}       Total {c |} {res} .019970178       218  .000091606   {txt}Root MSE        =   {res} .00957
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}    cpta_al1{col 14}{c |}      Coef.{col 26}   Std. Err.{col 38}      t{col 46}   P>|t|{col 54}     [95% Con{col 67}f. Interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 5}fd_ypta {c |}{col 14}{res}{space 2} 3.136547{col 26}{space 2} 3.174417{col 37}{space 1}    0.99{col 46}{space 3}0.324{col 54}{space 4} -3.12009{col 67}{space 3} 9.393183
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} .0329379{col 26}{space 2} .0007225{col 37}{space 1}   45.59{col 46}{space 3}0.000{col 54}{space 4} .0315138{col 67}{space 3} .0343619
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}{txt}
+{com}. 
+. *pause Part B completed
+. 
+. *** Part C
+. * Take logs of the relevant variables before running any regressions
+. * Run 2SLS with robust White standard errors as the question requests
+. * Run the first stage regression, where we try to separate the endogeneity of 
+. * first difference output from residuals from regression of consumption on fd output
+. reg ln_fd_ypta instrument1 instrument2 instrument3 instrument4
+
+{txt}      Source {c |}       SS           df       MS      Number of obs   ={res}       214
+{txt}{hline 13}{c +}{hline 34}   F(4, 209)       = {res}     2.30
+{txt}       Model {c |} {res} .000899724         4  .000224931   {txt}Prob > F        ={res}    0.0598
+{txt}    Residual {c |} {res} .020421808       209  .000097712   {txt}R-squared       ={res}    0.0422
+{txt}{hline 13}{c +}{hline 34}   Adj R-squared   ={res}    0.0239
+{txt}       Total {c |} {res} .021321531       213  .000100101   {txt}Root MSE        =   {res} .00988
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}  ln_fd_ypta{col 14}{c |}      Coef.{col 26}   Std. Err.{col 38}      t{col 46}   P>|t|{col 54}     [95% Con{col 67}f. Interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 1}instrument1 {c |}{col 14}{res}{space 2}-1.045102{col 26}{space 2} 8.959671{col 37}{space 1}   -0.12{col 46}{space 3}0.907{col 54}{space 4}-18.70801{col 67}{space 3} 16.61781
+{txt}{space 1}instrument2 {c |}{col 14}{res}{space 2} 19.96214{col 26}{space 2} 8.947577{col 37}{space 1}    2.23{col 46}{space 3}0.027{col 54}{space 4} 2.323066{col 67}{space 3} 37.60121
+{txt}{space 1}instrument3 {c |}{col 14}{res}{space 2} 8.536703{col 26}{space 2} 9.001974{col 37}{space 1}    0.95{col 46}{space 3}0.344{col 54}{space 4}-9.209603{col 67}{space 3} 26.28301
+{txt}{space 1}instrument4 {c |}{col 14}{res}{space 2}-17.30184{col 26}{space 2} 9.018146{col 37}{space 1}   -1.92{col 46}{space 3}0.056{col 54}{space 4}-35.08003{col 67}{space 3}  .476346
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} .0044698{col 26}{space 2} .0012121{col 37}{space 1}    3.69{col 46}{space 3}0.000{col 54}{space 4} .0020802{col 67}{space 3} .0068594
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}{txt}
+{com}. predict x_hat
+{txt}(option {bf:xb} assumed; fitted values)
+(6 missing values generated)
+
+{com}. reg ln_cpta_al1 x_hat, robust 
+
+{txt}Linear regression                               Number of obs     = {res}       214
+                                                {txt}F(1, 212)         =  {res}     0.89
+                                                {txt}Prob > F          = {res}    0.3456
+                                                {txt}R-squared         = {res}    0.0042
+                                                {txt}Root MSE          =    {res} .58033
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1} ln_cpta_al1{col 14}{c |}      Coef.{col 26}   Std. Err.{col 38}      t{col 46}   P>|t|{col 54}     [95% Con{col 67}f. Interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 7}x_hat {c |}{col 14}{res}{space 2} 18.26096{col 26}{space 2} 19.31713{col 37}{space 1}    0.95{col 46}{space 3}0.346{col 54}{space 4}-19.81731{col 67}{space 3} 56.33922
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2}-8.349497{col 26}{space 2} .1096208{col 37}{space 1}  -76.17{col 46}{space 3}0.000{col 54}{space 4}-8.565583{col 67}{space 3} -8.13341
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}{txt}
+{com}. 
+. * Should get the same results as the one-shot Stata command:
+. ivregress 2sls ln_cpta_al1 (ln_fd_ypta=instrument1 instrument2 instrument3 instrument4), robust
+{res}
+{txt}{col 1}Instrumental variables (2SLS) regression{col 51}Number of obs{col 67}= {res}       214
+{txt}{col 1}{col 51}Wald chi2({res}1{txt}){col 67}= {res}      0.73
+{txt}{col 1}{col 51}Prob > chi2{col 67}= {res}    0.3919
+{txt}{col 1}{col 51}R-squared{col 67}= {res}         .
+{txt}{col 51}Root MSE{col 67}=    {res} .62881
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1} ln_cpta_al1{col 14}{c |}      Coef.{col 26}   Std. Err.{col 38}      z{col 46}   P>|z|{col 54}     [95% Con{col 67}f. Interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 2}ln_fd_ypta {c |}{col 14}{res}{space 2} 18.26096{col 26}{space 2} 21.32902{col 37}{space 1}    0.86{col 46}{space 3}0.392{col 54}{space 4}-23.54315{col 67}{space 3} 60.06507
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2}-8.349497{col 26}{space 2} .1212462{col 37}{space 1}  -68.86{col 46}{space 3}0.000{col 54}{space 4}-8.587135{col 67}{space 3}-8.111859
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{p 0 15 22}Instrumented:{space 2}ln_fd_ypta{p_end}
+{p 0 15 22}Instruments:{space 3}instrument1 instrument2 instrument3 instrument4{p_end}
+
+{com}. 
+. *pause Part C completed
+. 
+{txt}end of do-file
+
+{com}. 
+. log close _all
+      {txt}name:  {res}Grant Aarons Assignment 4
+       {txt}log:  {res}C:\Users\gaarons\Git\Notes\Stata\2016F\Metrics\logs\stata_4.smcl
+  {txt}log type:  {res}smcl
+ {txt}closed on:  {res}10 Feb 2017, 18:01:14
+{txt}{.-}
+{smcl}
+{txt}{sf}{ul off}
