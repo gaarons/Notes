@@ -1,9 +1,9 @@
 {smcl}
-{txt}{sf}{ul off}{.-}
+{com}{sf}{ul off}{txt}{.-}
       name:  {res}Grant Aarons Assignment 4
        {txt}log:  {res}C:\Users\gaarons\Git\Notes\Stata\2016F\Metrics\logs\stata_4.smcl
   {txt}log type:  {res}smcl
- {txt}opened on:  {res}10 Feb 2017, 18:01:14
+ {txt}opened on:  {res}13 Feb 2017, 15:03:36
 {txt}
 {com}. * Use s or t to get smcl or text log file
 . /*
@@ -82,7 +82,7 @@
 {txt}(1 missing value generated)
 
 {com}. *cpta add lag 1
-. gen cpta_al1 = cpta+lcpta_1
+. gen cpta_sl1 = cpta-lcpta_1
 {txt}(1 missing value generated)
 
 {com}. 
@@ -102,7 +102,7 @@
 {txt}(1 missing value generated)
 
 {com}. * logarithm of cpta add lag 1
-. gen ln_cpta_al1 = ln_cpta+ln_lcpta_1
+. gen ln_cpta_sl1 = ln_cpta-ln_lcpta_1
 {txt}(1 missing value generated)
 
 {com}. 
@@ -158,20 +158,20 @@
 . * Set up the LHS variable to match the C_t + C_{c -(}t-1{c )-} in the homework write up
 . * Do the simple regression of C_t + C_{c -(}t-1{c )-} on first difference per capita income
 . * and a constant
-. reg cpta_al1 fd_ypta
+. reg cpta_sl1 fd_ypta
 
 {txt}      Source {c |}       SS           df       MS      Number of obs   ={res}       219
-{txt}{hline 13}{c +}{hline 34}   F(1, 217)       = {res}     0.98
-{txt}       Model {c |} {res} .000089443         1  .000089443   {txt}Prob > F        ={res}    0.3242
-{txt}    Residual {c |} {res} .019880734       217  .000091616   {txt}R-squared       ={res}    0.0045
-{txt}{hline 13}{c +}{hline 34}   Adj R-squared   ={res}   -0.0001
-{txt}       Total {c |} {res} .019970178       218  .000091606   {txt}Root MSE        =   {res} .00957
+{txt}{hline 13}{c +}{hline 34}   F(1, 217)       = {res}    55.15
+{txt}       Model {c |} {res} 2.8226e-07         1  2.8226e-07   {txt}Prob > F        ={res}    0.0000
+{txt}    Residual {c |} {res} 1.1105e-06       217  5.1177e-09   {txt}R-squared       ={res}    0.2027
+{txt}{hline 13}{c +}{hline 34}   Adj R-squared   ={res}    0.1990
+{txt}       Total {c |} {res} 1.3928e-06       218  6.3890e-09   {txt}Root MSE        =   {res} 7.2e-05
 
 {txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
-{col 1}    cpta_al1{col 14}{c |}      Coef.{col 26}   Std. Err.{col 38}      t{col 46}   P>|t|{col 54}     [95% Con{col 67}f. Interval]
+{col 1}    cpta_sl1{col 14}{c |}      Coef.{col 26}   Std. Err.{col 38}      t{col 46}   P>|t|{col 54}     [95% Con{col 67}f. Interval]
 {hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
-{space 5}fd_ypta {c |}{col 14}{res}{space 2} 3.136547{col 26}{space 2} 3.174417{col 37}{space 1}    0.99{col 46}{space 3}0.324{col 54}{space 4} -3.12009{col 67}{space 3} 9.393183
-{txt}{space 7}_cons {c |}{col 14}{res}{space 2} .0329379{col 26}{space 2} .0007225{col 37}{space 1}   45.59{col 46}{space 3}0.000{col 54}{space 4} .0315138{col 67}{space 3} .0343619
+{space 5}fd_ypta {c |}{col 14}{res}{space 2}  .176198{col 26}{space 2} .0237255{col 37}{space 1}    7.43{col 46}{space 3}0.000{col 54}{space 4} .1294361{col 67}{space 3}   .22296
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2}   .00006{col 26}{space 2} 5.40e-06{col 37}{space 1}   11.12{col 46}{space 3}0.000{col 54}{space 4} .0000494{col 67}{space 3} .0000707
 {txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
 {res}{txt}
 {com}. 
@@ -205,43 +205,50 @@
 {txt}(option {bf:xb} assumed; fitted values)
 (6 missing values generated)
 
-{com}. reg ln_cpta_al1 x_hat, robust 
+{com}. reg ln_cpta_sl1 x_hat, robust 
 
 {txt}Linear regression                               Number of obs     = {res}       214
-                                                {txt}F(1, 212)         =  {res}     0.89
-                                                {txt}Prob > F          = {res}    0.3456
-                                                {txt}R-squared         = {res}    0.0042
-                                                {txt}Root MSE          =    {res} .58033
+                                                {txt}F(1, 212)         =  {res}     5.59
+                                                {txt}Prob > F          = {res}    0.0189
+                                                {txt}R-squared         = {res}    0.0337
+                                                {txt}Root MSE          =    {res} .00513
 
 {txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
 {col 14}{c |}{col 26}    Robust
-{col 1} ln_cpta_al1{col 14}{c |}      Coef.{col 26}   Std. Err.{col 38}      t{col 46}   P>|t|{col 54}     [95% Con{col 67}f. Interval]
+{col 1} ln_cpta_sl1{col 14}{c |}      Coef.{col 26}   Std. Err.{col 38}      t{col 46}   P>|t|{col 54}     [95% Con{col 67}f. Interval]
 {hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
-{space 7}x_hat {c |}{col 14}{res}{space 2} 18.26096{col 26}{space 2} 19.31713{col 37}{space 1}    0.95{col 46}{space 3}0.346{col 54}{space 4}-19.81731{col 67}{space 3} 56.33922
-{txt}{space 7}_cons {c |}{col 14}{res}{space 2}-8.349497{col 26}{space 2} .1096208{col 37}{space 1}  -76.17{col 46}{space 3}0.000{col 54}{space 4}-8.565583{col 67}{space 3} -8.13341
+{space 7}x_hat {c |}{col 14}{res}{space 2} .4650085{col 26}{space 2} .1965977{col 37}{space 1}    2.37{col 46}{space 3}0.019{col 54}{space 4} .0774719{col 67}{space 3} .8525452
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} .0024648{col 26}{space 2} .0011691{col 37}{space 1}    2.11{col 46}{space 3}0.036{col 54}{space 4} .0001603{col 67}{space 3} .0047693
 {txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
 {res}{txt}
 {com}. 
 . * Should get the same results as the one-shot Stata command:
-. ivregress 2sls ln_cpta_al1 (ln_fd_ypta=instrument1 instrument2 instrument3 instrument4), robust
+. ivregress 2sls ln_cpta_sl1 (ln_fd_ypta=instrument1 instrument2 instrument3 instrument4), robust
 {res}
 {txt}{col 1}Instrumental variables (2SLS) regression{col 51}Number of obs{col 67}= {res}       214
-{txt}{col 1}{col 51}Wald chi2({res}1{txt}){col 67}= {res}      0.73
-{txt}{col 1}{col 51}Prob > chi2{col 67}= {res}    0.3919
-{txt}{col 1}{col 51}R-squared{col 67}= {res}         .
-{txt}{col 51}Root MSE{col 67}=    {res} .62881
+{txt}{col 1}{col 51}Wald chi2({res}1{txt}){col 67}= {res}      6.41
+{txt}{col 1}{col 51}Prob > chi2{col 67}= {res}    0.0113
+{txt}{col 1}{col 51}R-squared{col 67}= {res}    0.0246
+{txt}{col 51}Root MSE{col 67}=    {res} .00513
 
 {txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
 {col 14}{c |}{col 26}    Robust
-{col 1} ln_cpta_al1{col 14}{c |}      Coef.{col 26}   Std. Err.{col 38}      z{col 46}   P>|z|{col 54}     [95% Con{col 67}f. Interval]
+{col 1} ln_cpta_sl1{col 14}{c |}      Coef.{col 26}   Std. Err.{col 38}      z{col 46}   P>|z|{col 54}     [95% Con{col 67}f. Interval]
 {hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
-{space 2}ln_fd_ypta {c |}{col 14}{res}{space 2} 18.26096{col 26}{space 2} 21.32902{col 37}{space 1}    0.86{col 46}{space 3}0.392{col 54}{space 4}-23.54315{col 67}{space 3} 60.06507
-{txt}{space 7}_cons {c |}{col 14}{res}{space 2}-8.349497{col 26}{space 2} .1212462{col 37}{space 1}  -68.86{col 46}{space 3}0.000{col 54}{space 4}-8.587135{col 67}{space 3}-8.111859
+{space 2}ln_fd_ypta {c |}{col 14}{res}{space 2} .4650085{col 26}{space 2} .1836412{col 37}{space 1}    2.53{col 46}{space 3}0.011{col 54}{space 4} .1050783{col 67}{space 3} .8249387
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} .0024648{col 26}{space 2} .0010782{col 37}{space 1}    2.29{col 46}{space 3}0.022{col 54}{space 4} .0003516{col 67}{space 3}  .004578
 {txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
 {p 0 15 22}Instrumented:{space 2}ln_fd_ypta{p_end}
 {p 0 15 22}Instruments:{space 3}instrument1 instrument2 instrument3 instrument4{p_end}
 
 {com}. 
+. * The two results have exact same coefficient values, but the top two step that
+. * I set up for 2 SLS has a larger SE because I have not corrected for the compounded SE
+. * from the first stage.  Should use 1 step command, because corrects for this which
+. * I was not told to do, and do not want to do here.
+. 
+. * In MATLAB, I will try to replicate the larger SE version that hasnt had correction
+. * for regressor/regression compounding of the SE.
 . *pause Part C completed
 . 
 {txt}end of do-file
@@ -251,7 +258,7 @@
       {txt}name:  {res}Grant Aarons Assignment 4
        {txt}log:  {res}C:\Users\gaarons\Git\Notes\Stata\2016F\Metrics\logs\stata_4.smcl
   {txt}log type:  {res}smcl
- {txt}closed on:  {res}10 Feb 2017, 18:01:14
+ {txt}closed on:  {res}13 Feb 2017, 15:03:36
 {txt}{.-}
 {smcl}
 {txt}{sf}{ul off}

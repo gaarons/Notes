@@ -2,7 +2,7 @@
       name:  Grant Aarons Assignment 4
        log:  C:\Users\gaarons\Git\Notes\Stata\2016F\Metrics\logs\stata_4.log
   log type:  text
- opened on:  10 Feb 2017, 18:00:35
+ opened on:  13 Feb 2017, 15:03:29
 
 . * Use s or t to get smcl or text log file
 . /*
@@ -81,7 +81,7 @@
 (1 missing value generated)
 
 . *cpta add lag 1
-. gen cpta_al1 = cpta+lcpta_1
+. gen cpta_sl1 = cpta-lcpta_1
 (1 missing value generated)
 
 . 
@@ -101,7 +101,7 @@
 (1 missing value generated)
 
 . * logarithm of cpta add lag 1
-. gen ln_cpta_al1 = ln_cpta+ln_lcpta_1
+. gen ln_cpta_sl1 = ln_cpta-ln_lcpta_1
 (1 missing value generated)
 
 . 
@@ -157,20 +157,20 @@
 . * Set up the LHS variable to match the C_t + C_{t-1} in the homework write up
 . * Do the simple regression of C_t + C_{t-1} on first difference per capita income
 . * and a constant
-. reg cpta_al1 fd_ypta
+. reg cpta_sl1 fd_ypta
 
       Source |       SS           df       MS      Number of obs   =       219
--------------+----------------------------------   F(1, 217)       =      0.98
-       Model |  .000089443         1  .000089443   Prob > F        =    0.3242
-    Residual |  .019880734       217  .000091616   R-squared       =    0.0045
--------------+----------------------------------   Adj R-squared   =   -0.0001
-       Total |  .019970178       218  .000091606   Root MSE        =    .00957
+-------------+----------------------------------   F(1, 217)       =     55.15
+       Model |  2.8226e-07         1  2.8226e-07   Prob > F        =    0.0000
+    Residual |  1.1105e-06       217  5.1177e-09   R-squared       =    0.2027
+-------------+----------------------------------   Adj R-squared   =    0.1990
+       Total |  1.3928e-06       218  6.3890e-09   Root MSE        =    7.2e-05
 
 ------------------------------------------------------------------------------
-    cpta_al1 |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+    cpta_sl1 |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
 -------------+----------------------------------------------------------------
-     fd_ypta |   3.136547   3.174417     0.99   0.324     -3.12009    9.393183
-       _cons |   .0329379   .0007225    45.59   0.000     .0315138    .0343619
+     fd_ypta |    .176198   .0237255     7.43   0.000     .1294361      .22296
+       _cons |     .00006   5.40e-06    11.12   0.000     .0000494    .0000707
 ------------------------------------------------------------------------------
 
 . 
@@ -204,43 +204,50 @@
 (option xb assumed; fitted values)
 (6 missing values generated)
 
-. reg ln_cpta_al1 x_hat, robust 
+. reg ln_cpta_sl1 x_hat, robust 
 
 Linear regression                               Number of obs     =        214
-                                                F(1, 212)         =       0.89
-                                                Prob > F          =     0.3456
-                                                R-squared         =     0.0042
-                                                Root MSE          =     .58033
+                                                F(1, 212)         =       5.59
+                                                Prob > F          =     0.0189
+                                                R-squared         =     0.0337
+                                                Root MSE          =     .00513
 
 ------------------------------------------------------------------------------
              |               Robust
- ln_cpta_al1 |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+ ln_cpta_sl1 |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
 -------------+----------------------------------------------------------------
-       x_hat |   18.26096   19.31713     0.95   0.346    -19.81731    56.33922
-       _cons |  -8.349497   .1096208   -76.17   0.000    -8.565583    -8.13341
+       x_hat |   .4650085   .1965977     2.37   0.019     .0774719    .8525452
+       _cons |   .0024648   .0011691     2.11   0.036     .0001603    .0047693
 ------------------------------------------------------------------------------
 
 . 
 . * Should get the same results as the one-shot Stata command:
-. ivregress 2sls ln_cpta_al1 (ln_fd_ypta=instrument1 instrument2 instrument3 instrument4), robust
+. ivregress 2sls ln_cpta_sl1 (ln_fd_ypta=instrument1 instrument2 instrument3 instrument4), robust
 
 Instrumental variables (2SLS) regression          Number of obs   =        214
-                                                  Wald chi2(1)    =       0.73
-                                                  Prob > chi2     =     0.3919
-                                                  R-squared       =          .
-                                                  Root MSE        =     .62881
+                                                  Wald chi2(1)    =       6.41
+                                                  Prob > chi2     =     0.0113
+                                                  R-squared       =     0.0246
+                                                  Root MSE        =     .00513
 
 ------------------------------------------------------------------------------
              |               Robust
- ln_cpta_al1 |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+ ln_cpta_sl1 |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
 -------------+----------------------------------------------------------------
-  ln_fd_ypta |   18.26096   21.32902     0.86   0.392    -23.54315    60.06507
-       _cons |  -8.349497   .1212462   -68.86   0.000    -8.587135   -8.111859
+  ln_fd_ypta |   .4650085   .1836412     2.53   0.011     .1050783    .8249387
+       _cons |   .0024648   .0010782     2.29   0.022     .0003516     .004578
 ------------------------------------------------------------------------------
 Instrumented:  ln_fd_ypta
 Instruments:   instrument1 instrument2 instrument3 instrument4
 
 . 
+. * The two results have exact same coefficient values, but the top two step that
+. * I set up for 2 SLS has a larger SE because I have not corrected for the compounded SE
+. * from the first stage.  Should use 1 step command, because corrects for this which
+. * I was not told to do, and do not want to do here.
+. 
+. * In MATLAB, I will try to replicate the larger SE version that hasnt had correction
+. * for regressor/regression compounding of the SE.
 . *pause Part C completed
 . 
 end of do-file
@@ -250,5 +257,5 @@ end of do-file
       name:  Grant Aarons Assignment 4
        log:  C:\Users\gaarons\Git\Notes\Stata\2016F\Metrics\logs\stata_4.log
   log type:  text
- closed on:  10 Feb 2017, 18:00:36
+ closed on:  13 Feb 2017, 15:03:29
 --------------------------------------------------------------------------------------------------

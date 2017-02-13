@@ -29,7 +29,7 @@ gen lypta_1 = l.ypta
 * first difference income per capita
 gen fd_ypta = ypta-lypta_1
 *cpta add lag 1
-gen cpta_al1 = cpta+lcpta_1
+gen cpta_sl1 = cpta-lcpta_1
 
 * Logical thing to do, take logs and then do all the generated variables again
 gen ln_cpta = ln(cpta)
@@ -39,7 +39,7 @@ gen ln_lypta_1 = l.ln_ypta
 * logarithm of first difference income per capita
 gen ln_fd_ypta = ln_ypta-ln_lypta_1
 * logarithm of cpta add lag 1
-gen ln_cpta_al1 = ln_cpta+ln_lcpta_1
+gen ln_cpta_sl1 = ln_cpta-ln_lcpta_1
 
 gen instrument1 = lcpta_2 - lcpta_3
 gen instrument2 = lcpta_3 - lcpta_4
@@ -59,7 +59,7 @@ test lcpta_2=lcpta_3=lcpta_4=0
 * Set up the LHS variable to match the C_t + C_{t-1} in the homework write up
 * Do the simple regression of C_t + C_{t-1} on first difference per capita income
 * and a constant
-reg cpta_al1 fd_ypta
+reg cpta_sl1 fd_ypta
 
 *pause Part B completed
 
@@ -70,9 +70,16 @@ reg cpta_al1 fd_ypta
 * first difference output from residuals from regression of consumption on fd output
 reg ln_fd_ypta instrument1 instrument2 instrument3 instrument4
 predict x_hat
-reg ln_cpta_al1 x_hat, robust 
+reg ln_cpta_sl1 x_hat, robust 
 
 * Should get the same results as the one-shot Stata command:
-ivregress 2sls ln_cpta_al1 (ln_fd_ypta=instrument1 instrument2 instrument3 instrument4), robust
+ivregress 2sls ln_cpta_sl1 (ln_fd_ypta=instrument1 instrument2 instrument3 instrument4), robust
 
+* The two results have exact same coefficient values, but the top two step that
+* I set up for 2 SLS has a larger SE because I have not corrected for the compounded SE
+* from the first stage.  Should use 1 step command, because corrects for this which
+* I was not told to do, and do not want to do here.
+
+* In MATLAB, I will try to replicate the larger SE version that hasnt had correction
+* for regressor/regression compounding of the SE.
 *pause Part C completed
