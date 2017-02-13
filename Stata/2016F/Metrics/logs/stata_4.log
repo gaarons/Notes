@@ -2,7 +2,7 @@
       name:  Grant Aarons Assignment 4
        log:  C:\Users\gaarons\Git\Notes\Stata\2016F\Metrics\logs\stata_4.log
   log type:  text
- opened on:  13 Feb 2017, 15:03:29
+ opened on:  13 Feb 2017, 15:37:58
 
 . * Use s or t to get smcl or text log file
 . /*
@@ -81,7 +81,7 @@
 (1 missing value generated)
 
 . *cpta add lag 1
-. gen cpta_sl1 = cpta-lcpta_1
+. gen fd_cpta = cpta-lcpta_1
 (1 missing value generated)
 
 . 
@@ -90,31 +90,49 @@
 
 . gen ln_ypta = ln(ypta)
 
+. 
+. * Prettier ways of doing this but whatever
 . gen ln_lcpta_1 = l.ln_cpta 
 (1 missing value generated)
+
+. gen ln_lcpta_2 = l.ln_lcpta_1
+(2 missing values generated)
+
+. gen ln_lcpta_3 = l.ln_lcpta_2
+(3 missing values generated)
+
+. gen ln_lcpta_4 = l.ln_lcpta_3
+(4 missing values generated)
+
+. gen ln_lcpta_5 = l.ln_lcpta_4
+(5 missing values generated)
+
+. gen ln_lcpta_6 = l.ln_lcpta_5
+(6 missing values generated)
 
 . gen ln_lypta_1 = l.ln_ypta 
 (1 missing value generated)
 
+. 
 . * logarithm of first difference income per capita
 . gen ln_fd_ypta = ln_ypta-ln_lypta_1
 (1 missing value generated)
 
-. * logarithm of cpta add lag 1
-. gen ln_cpta_sl1 = ln_cpta-ln_lcpta_1
+. * logarithm of first difference consumption per capita
+. gen ln_fd_cpta = ln_cpta-ln_lcpta_1
 (1 missing value generated)
 
 . 
-. gen instrument1 = lcpta_2 - lcpta_3
+. gen instrument1 = ln_lcpta_2 - ln_lcpta_3
 (3 missing values generated)
 
-. gen instrument2 = lcpta_3 - lcpta_4
+. gen instrument2 = ln_lcpta_3 - ln_lcpta_4
 (4 missing values generated)
 
-. gen instrument3 = lcpta_4 - lcpta_5
+. gen instrument3 = ln_lcpta_4 - ln_lcpta_5
 (5 missing values generated)
 
-. gen instrument4 = lcpta_5 - lcpta_6 
+. gen instrument4 = ln_lcpta_5 - ln_lcpta_6 
 (6 missing values generated)
 
 . 
@@ -154,10 +172,10 @@
 . *pause Part A completed
 . 
 . *** Part B
-. * Set up the LHS variable to match the C_t + C_{t-1} in the homework write up
-. * Do the simple regression of C_t + C_{t-1} on first difference per capita income
+. * Set up the LHS variable to match the C_t - C_{t-1} in the homework write up
+. * Do the simple regression of C_t - C_{t-1} on first difference per capita income
 . * and a constant
-. reg cpta_sl1 fd_ypta
+. reg fd_cpta fd_ypta
 
       Source |       SS           df       MS      Number of obs   =       219
 -------------+----------------------------------   F(1, 217)       =     55.15
@@ -167,7 +185,7 @@
        Total |  1.3928e-06       218  6.3890e-09   Root MSE        =    7.2e-05
 
 ------------------------------------------------------------------------------
-    cpta_sl1 |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+     fd_cpta |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
 -------------+----------------------------------------------------------------
      fd_ypta |    .176198   .0237255     7.43   0.000     .1294361      .22296
        _cons |     .00006   5.40e-06    11.12   0.000     .0000494    .0000707
@@ -184,58 +202,58 @@
 . reg ln_fd_ypta instrument1 instrument2 instrument3 instrument4
 
       Source |       SS           df       MS      Number of obs   =       214
--------------+----------------------------------   F(4, 209)       =      2.30
-       Model |  .000899724         4  .000224931   Prob > F        =    0.0598
-    Residual |  .020421808       209  .000097712   R-squared       =    0.0422
--------------+----------------------------------   Adj R-squared   =    0.0239
-       Total |  .021321531       213  .000100101   Root MSE        =    .00988
+-------------+----------------------------------   F(4, 209)       =      2.51
+       Model |  .000976969         4  .000244242   Prob > F        =    0.0430
+    Residual |  .020344562       209  .000097342   R-squared       =    0.0458
+-------------+----------------------------------   Adj R-squared   =    0.0276
+       Total |  .021321531       213  .000100101   Root MSE        =    .00987
 
 ------------------------------------------------------------------------------
   ln_fd_ypta |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
 -------------+----------------------------------------------------------------
- instrument1 |  -1.045102   8.959671    -0.12   0.907    -18.70801    16.61781
- instrument2 |   19.96214   8.947577     2.23   0.027     2.323066    37.60121
- instrument3 |   8.536703   9.001974     0.95   0.344    -9.209603    26.28301
- instrument4 |  -17.30184   9.018146    -1.92   0.056    -35.08003     .476346
-       _cons |   .0044698   .0012121     3.69   0.000     .0020802    .0068594
+ instrument1 |  -.0185833   .1358824    -0.14   0.891    -.2864591    .2492925
+ instrument2 |   .3372076   .1367773     2.47   0.014     .0675677    .6068475
+ instrument3 |    .170375   .1363403     1.25   0.213    -.0984035    .4391535
+ instrument4 |  -.2218674   .1351864    -1.64   0.102    -.4883711    .0446363
+       _cons |   .0039572   .0012099     3.27   0.001     .0015721    .0063423
 ------------------------------------------------------------------------------
 
 . predict x_hat
 (option xb assumed; fitted values)
 (6 missing values generated)
 
-. reg ln_cpta_sl1 x_hat, robust 
+. reg ln_fd_cpta x_hat, robust 
 
 Linear regression                               Number of obs     =        214
-                                                F(1, 212)         =       5.59
-                                                Prob > F          =     0.0189
-                                                R-squared         =     0.0337
+                                                F(1, 212)         =       4.59
+                                                Prob > F          =     0.0332
+                                                R-squared         =     0.0323
                                                 Root MSE          =     .00513
 
 ------------------------------------------------------------------------------
              |               Robust
- ln_cpta_sl1 |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+  ln_fd_cpta |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
 -------------+----------------------------------------------------------------
-       x_hat |   .4650085   .1965977     2.37   0.019     .0774719    .8525452
-       _cons |   .0024648   .0011691     2.11   0.036     .0001603    .0047693
+       x_hat |   .4369222   .2038442     2.14   0.033     .0351009    .8387434
+       _cons |    .002613   .0012046     2.17   0.031     .0002384    .0049875
 ------------------------------------------------------------------------------
 
 . 
 . * Should get the same results as the one-shot Stata command:
-. ivregress 2sls ln_cpta_sl1 (ln_fd_ypta=instrument1 instrument2 instrument3 instrument4), robust
+. ivregress 2sls ln_fd_cpta (ln_fd_ypta=instrument1 instrument2 instrument3 instrument4), robust
 
 Instrumental variables (2SLS) regression          Number of obs   =        214
-                                                  Wald chi2(1)    =       6.41
-                                                  Prob > chi2     =     0.0113
-                                                  R-squared       =     0.0246
-                                                  Root MSE        =     .00513
+                                                  Wald chi2(1)    =       4.65
+                                                  Prob > chi2     =     0.0310
+                                                  R-squared       =     0.0685
+                                                  Root MSE        =     .00501
 
 ------------------------------------------------------------------------------
              |               Robust
- ln_cpta_sl1 |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+  ln_fd_cpta |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
 -------------+----------------------------------------------------------------
-  ln_fd_ypta |   .4650085   .1836412     2.53   0.011     .1050783    .8249387
-       _cons |   .0024648   .0010782     2.29   0.022     .0003516     .004578
+  ln_fd_ypta |   .4369222   .2025541     2.16   0.031     .0399234     .833921
+       _cons |    .002613   .0011573     2.26   0.024     .0003448    .0048811
 ------------------------------------------------------------------------------
 Instrumented:  ln_fd_ypta
 Instruments:   instrument1 instrument2 instrument3 instrument4
@@ -257,5 +275,5 @@ end of do-file
       name:  Grant Aarons Assignment 4
        log:  C:\Users\gaarons\Git\Notes\Stata\2016F\Metrics\logs\stata_4.log
   log type:  text
- closed on:  13 Feb 2017, 15:03:29
+ closed on:  13 Feb 2017, 15:37:58
 --------------------------------------------------------------------------------------------------
